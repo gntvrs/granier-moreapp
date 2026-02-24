@@ -3,6 +3,7 @@ import json
 from fastapi import FastAPI, Request, HTTPException
 from app.settings import settings
 from app.bq_client import insert_raw_event
+import logging
 
 app = FastAPI()
 
@@ -30,7 +31,7 @@ async def pubsub_push(request: Request):
     try:
         insert_raw_event(settings.GCP_PROJECT_ID, settings.BQ_DATASET, settings.BQ_TABLE, event)
     except Exception as e:
-        # Si devuelves != 2xx, Pub/Sub reintentará
+        logging.exception("BQ insert failed")  # imprime stacktrace en stderr
         raise HTTPException(status_code=500, detail=f"BQ insert failed: {str(e)}")
 
     return {"status": "ok"}
