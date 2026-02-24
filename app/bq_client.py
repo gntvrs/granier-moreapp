@@ -1,5 +1,6 @@
 from google.cloud import bigquery
 from datetime import datetime, timezone
+import json
 
 def _safe_get(d: dict, path: list[str], default=None):
     cur = d
@@ -35,7 +36,7 @@ def insert_raw_event(project_id: str, dataset: str, table: str, event: dict) -> 
         "submission_id": submission_id,
         "form_id": form_id,
         "submitted_at": submitted_at,   # si viene ISO string, BQ lo parsea si el schema es TIMESTAMP
-        "payload": event,               # tipo JSON en BQ (recomendado)
+        "payload": json.dumps(event, ensure_ascii=False),
         "ingested_at": datetime.now(timezone.utc).isoformat(),
     }
 
