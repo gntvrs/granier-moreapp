@@ -41,4 +41,4 @@ def insert_raw_event(project_id: str, dataset: str, table: str, event: dict) -> 
 
     errors = client.insert_rows_json(table_id, [row])
     if errors:
-        raise RuntimeError(f"BigQuery insert errors: {errors}")
+        raise RuntimeError(f"BigQuery insert_rows_json returned errors: {errors}")
