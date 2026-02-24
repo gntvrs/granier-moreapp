@@ -3,8 +3,6 @@ import hashlib
 import time
 
 def parse_signature_header(header_value: str) -> tuple[int, str]:
-    # Formato esperado: t=1234567890, v1=abcdef...
-    # Ojo: a veces viene sin espacios
     parts = [p.strip() for p in header_value.split(",")]
     kv = {}
     for p in parts:
@@ -14,7 +12,14 @@ def parse_signature_header(header_value: str) -> tuple[int, str]:
         kv[k.strip()] = v.strip()
     if "t" not in kv or "v1" not in kv:
         raise ValueError("Missing t or v1 in signature header")
-    return int(kv["t"]), kv["v1"]
+
+    ts = int(kv["t"])
+
+    # ✅ Si viene en milisegundos, lo pasamos a segundos
+    if ts > 10**12:  # 1e12 ~ 2001 en ms, todo lo actual en ms será > 1e12
+        ts = ts // 1000
+
+    return ts, kv["v1"]
 
 def verify_moreapp_signature(
     signature_header: str,
